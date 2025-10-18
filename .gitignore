@@ -1,0 +1,27 @@
+# .gitignore - ADD THESE LINES
+
+# Ignore ALL dataset files
+pcb-defect-dataset/
+dataset/
+
+# Ignore all label files
+*.txt
+
+# Ignore all image files  
+*.jpg
+*.jpeg
+*.png
+*.JPG
+
+# Ignore model files
+models/
+*.h5
+*.pkl
+
+# Ignore result files
+results/
+
+# Python and IDE files (keep these)
+__pycache__/
+*.pyc
+.vscode/
