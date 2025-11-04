@@ -170,4 +170,5 @@ def train_on_cpu():
 
 if __name__ == "__main__":
     print("NUCLEAR OPTION - CPU ONLY TRAINING")
+    debug_data_issue()
     history = train_on_cpu()
