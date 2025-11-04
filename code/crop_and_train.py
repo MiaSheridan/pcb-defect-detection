@@ -5,6 +5,44 @@ import tensorflow as tf
 import cv2
 import numpy as np
 
+#DIAGNOSTIC FUNCTION CUZ ITS OVERFITTING TOO MUCH
+def debug_data_issue():
+    """Check if training and validation data are compatible"""
+    print("=== DATA COMPATIBILITY CHECK ===")
+    
+    # Check if we're creating the same dataset structure for both
+    train_path = "/content/pcb-defect-dataset/train"
+    val_path = "/content/pcb-defect-dataset/val"
+    
+    print("Training set classes:")
+    train_images = os.listdir(os.path.join(train_path, 'images'))
+    print(f"  Images: {len(train_images)}")
+    
+    print("Validation set classes:")  
+    val_images = os.listdir(os.path.join(val_path, 'images'))
+    print(f"  Images: {len(val_images)}")
+    
+    # Check if we're mixing up something
+    print(f"\nFirst few training images: {train_images[:3]}")
+    print(f"First few validation images: {val_images[:3]}")
+    
+    # Check class distribution in labels
+    def count_classes(label_dir):
+        class_counts = [0]*6
+        for label_file in os.listdir(label_dir)[:10]:  # Check first 10
+            with open(os.path.join(label_dir, label_file), 'r') as f:
+                for line in f:
+                    class_id = int(line.strip().split()[0])
+                    if 0 <= class_id < 6:
+                        class_counts[class_id] += 1
+        return class_counts
+    
+    print(f"\nTraining class distribution: {count_classes(os.path.join(train_path, 'labels'))}")
+    print(f"Validation class distribution: {count_classes(os.path.join(val_path, 'labels'))}")
+
+# Call this before training
+debug_data_issue()
+
 def create_tiny_dataset():
     """Create the smallest possible dataset that will work"""
     print("==CREATING TINY DATASET ===")
