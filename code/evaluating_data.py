@@ -1,5 +1,6 @@
 
 import tensorflow as tf
+tf.keras.backend.clear_session()
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
@@ -20,7 +21,7 @@ def create_validation_generator():
     
     val_generator = val_datagen.flow_from_directory(
         os.path.join(dataset_path, 'val'), 
-        target_size=(600, 600),          
+        target_size=(224, 224),          
         batch_size=16,                      
         class_mode='categorical',           
         shuffle=False,                      
@@ -33,8 +34,8 @@ def evaluate_model():
     print(" Evaluating PCB Defect Detection Model ")
     
     #load your best model
-    print("Loading trained model from models/best_pcb_model.h5...")
-    model = tf.keras.models.load_model('models/best_pcb_model.h5')
+    print("Loading trained model from models/best_pcb_model_224.h5...")
+    model = tf.keras.models.load_model('models/best_pcb_model_224.h5')
     print("Model loaded successfully!")
     
     #create validation generator (matches training exactly)
