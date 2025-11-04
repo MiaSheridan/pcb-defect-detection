@@ -9,8 +9,8 @@ def create_tiny_dataset():
     """Create the smallest possible dataset that will work"""
     print("=== CREATING TINY DATASET ===")
     
-    base_path = "pcb-defect-dataset/train"
-    output_path = "tiny_dataset"
+    base_path =  "/content/pcb-defect-dataset/train"
+    output_path = "/content/pcb-defect-detection/tiny_dataset"
     
     # Create directories
     for class_id in range(6):
