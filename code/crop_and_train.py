@@ -86,17 +86,17 @@ def train_on_cpu():
         tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(64,64,3)),
         tf.keras.layers.BatchNormalization(),  
         tf.keras.layers.MaxPooling2D(2,2),
-        tf.keras.layers.Dropout(0.25), 
+        tf.keras.layers.Dropout(0.4), 
         
         tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
         tf.keras.layers.BatchNormalization(),  
         tf.keras.layers.MaxPooling2D(2,2),
-        tf.keras.layers.Dropout(0.25),  
+        tf.keras.layers.Dropout(0.4),  
         
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(256, activation='relu'), 
         tf.keras.layers.BatchNormalization(), 
-        tf.keras.layers.Dropout(0.5), 
+        tf.keras.layers.Dropout(0.7), 
         tf.keras.layers.Dense(6, activation='softmax')
     ])
     
@@ -107,7 +107,17 @@ def train_on_cpu():
     )
     
     print("Training MICROSCOPIC CNN on CPU...")
-    history = model.fit(X_train, y_train, epochs=20, validation_split=0.2, verbose=1, batch_size=32)
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+    monitor='val_accuracy',
+    patience=5,
+    restore_best_weights=True
+    )
+
+    history = model.fit(X_train, y_train, epochs=20, 
+                   validation_split=0.2, 
+                   verbose=1, 
+                   batch_size=32,
+                   callbacks=[early_stopping])
 
     # Quick test
     train_acc = history.history['accuracy'][-1]
