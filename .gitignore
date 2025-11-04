@@ -1,4 +1,4 @@
-# .gitignore - ADD THESE LINES
+# .gitignore - UPDATED
 
 # Ignore ALL dataset files
 pcb-defect-dataset/
@@ -13,15 +13,20 @@ dataset/
 *.png
 *.JPG
 
-# Ignore model files
+# Ignore model files - ADD .pt HERE!
 models/
 *.h5
 *.pkl
+*.pt
+*.weights.h5
 
 # Ignore result files
 results/
 
-# Python and IDE files (keep these)
+# Python and IDE files
 __pycache__/
 *.pyc
 .vscode/
+
+# OS files
+.DS_Store
