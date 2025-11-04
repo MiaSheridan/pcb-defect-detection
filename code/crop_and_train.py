@@ -16,9 +16,9 @@ def create_tiny_dataset():
     for class_id in range(6):
         os.makedirs(os.path.join(output_path, str(class_id)), exist_ok=True)
     
-    # Only process 10 images total to avoid memory issues
+  
     images_processed = 0
-    max_per_class = 50 #50 images per class
+    max_per_class = 150 #50 images per class
     
     
     for class_id in range(6):
@@ -38,15 +38,17 @@ def create_tiny_dataset():
                         for line in f:
                             line_class_id, x_center, y_center, bbox_w, bbox_h = map(float, line.strip().split())
                             if int(line_class_id) == class_id:
-                                # Load and crop
+                                #Load and crop
                                 img_path = os.path.join(images_dir, img_file)
                                 img = cv2.imread(img_path)
                                 h, w = img.shape[:2]
+
+                                padding = 25  # Add some padding around the bbox
                                 
-                                x1 = int((x_center - bbox_w/2) * w)
-                                y1 = int((y_center - bbox_h/2) * h)
-                                x2 = int((x_center + bbox_w/2) * w)
-                                y2 = int((y_center + bbox_h/2) * h)
+                                x1 = max(0, int((x_center - bbox_w/2) * w) - padding)  
+                                y1 = max(0, int((y_center - bbox_h/2) * h) - padding)  
+                                x2 = min(w, int((x_center + bbox_w/2) * w) + padding) 
+                                y2 = min(h, int((y_center + bbox_h/2) * h) + padding) 
                                 
                                 crop = img[max(0,y1):min(h,y2), max(0,x1):min(w,x2)]
                                 
@@ -58,14 +60,14 @@ def create_tiny_dataset():
                                     images_processed += 1
                                 break
     
-    print(f"✅ Created tiny dataset with {images_processed} images!")
+    print(f" Created tiny dataset with {images_processed} images!")
     return output_path
 
 def train_on_cpu():
     """Train a microscopic CNN on CPU only"""
     dataset_path = create_tiny_dataset()
     
-    # Manual data loading - NO generators
+    #Manual data loading NO generators
     X_train, y_train = [], []
     
     for class_id in range(6):
@@ -73,29 +75,40 @@ def train_on_cpu():
         for img_file in os.listdir(class_path):
             img_path = os.path.join(class_path, img_file)
             img = cv2.imread(img_path)
-            img = img / 255.0  # Normalize
+            img = img / 255.0  #Normalize
             X_train.append(img)
             y_train.append(class_id)
     
     X_train = np.array(X_train)
     y_train = tf.keras.utils.to_categorical(y_train, 6)
     
-    # MICROSCOPIC CNN
     model = tf.keras.Sequential([
-    tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(64,64,3)),  #bigger
-    tf.keras.layers.MaxPooling2D(2,2),
-    tf.keras.layers.Conv2D(64, (3,3), activation='relu'),  #adding layer
-    tf.keras.layers.MaxPooling2D(2,2),
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(128, activation='relu'),  #bigger
-    tf.keras.layers.Dense(6, activation='softmax')
-  ])
+        tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(64,64,3)),
+        tf.keras.layers.BatchNormalization(),  
+        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Dropout(0.25), 
+        
+        tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
+        tf.keras.layers.BatchNormalization(),  
+        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Dropout(0.25),  
+        
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(256, activation='relu'), 
+        tf.keras.layers.BatchNormalization(), 
+        tf.keras.layers.Dropout(0.5), 
+        tf.keras.layers.Dense(6, activation='softmax')
+    ])
     
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        loss='categorical_crossentropy', 
+        metrics=['accuracy']
+    )
     
     print("Training MICROSCOPIC CNN on CPU...")
-    history = model.fit(X_train, y_train, epochs=3, validation_split=0.2, verbose=1, batch_size=8)
-    
+    history = model.fit(X_train, y_train, epochs=20, validation_split=0.2, verbose=1, batch_size=32)
+
     # Quick test
     train_acc = history.history['accuracy'][-1]
     val_acc = history.history['val_accuracy'][-1] if 'val_accuracy' in history.history else 0
@@ -110,4 +123,3 @@ def train_on_cpu():
 if __name__ == "__main__":
     print("NUCLEAR OPTION - CPU ONLY TRAINING")
     history = train_on_cpu()
-    print("DONE! Even if accuracy is low, at least it RUNS!")
