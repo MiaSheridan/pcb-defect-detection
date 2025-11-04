@@ -7,7 +7,7 @@ import numpy as np
 
 def create_tiny_dataset():
     """Create the smallest possible dataset that will work"""
-    print("=== CREATING TINY DATASET ===")
+    print("==CREATING TINY DATASET ===")
     
     base_path =  "/content/pcb-defect-dataset/train"
     output_path = "/content/pcb-defect-detection/tiny_dataset"
@@ -18,7 +18,8 @@ def create_tiny_dataset():
     
     # Only process 10 images total to avoid memory issues
     images_processed = 0
-    max_per_class = 2  # 2 images per class
+    max_per_class = 50 #50 images per class
+    crop = cv2.resize(crop, (64, 64))  # Better image size
     
     for class_id in range(6):
         count = 0
@@ -81,12 +82,14 @@ def train_on_cpu():
     
     # MICROSCOPIC CNN
     model = tf.keras.Sequential([
-        tf.keras.layers.Conv2D(8, (3,3), activation='relu', input_shape=(32,32,3)),  # TINY
-        tf.keras.layers.MaxPooling2D(2,2),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(16, activation='relu'),  # TINY
-        tf.keras.layers.Dense(6, activation='softmax')
-    ])
+    tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(64,64,3)),  #bigger
+    tf.keras.layers.MaxPooling2D(2,2),
+    tf.keras.layers.Conv2D(64, (3,3), activation='relu'),  #adding layer
+    tf.keras.layers.MaxPooling2D(2,2),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(128, activation='relu'),  #bigger
+    tf.keras.layers.Dense(6, activation='softmax')
+  ])
     
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     
@@ -105,6 +108,6 @@ def train_on_cpu():
     return history
 
 if __name__ == "__main__":
-    print("🚀 NUCLEAR OPTION - CPU ONLY TRAINING")
+    print("NUCLEAR OPTION - CPU ONLY TRAINING")
     history = train_on_cpu()
-    print("💥 DONE! Even if accuracy is low, at least it RUNS!")
+    print("DONE! Even if accuracy is low, at least it RUNS!")
