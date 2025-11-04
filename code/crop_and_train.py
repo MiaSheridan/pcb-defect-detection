@@ -130,70 +130,74 @@ def train_on_cpu():
     """Train a microscopic CNN on CPU only"""
     dataset_path = create_better_dataset()
     
-    #Manual data loading NO generators
-    X_train, y_train = [], []
+    #Manual data loading with PROPER splitting 80/20
+    X_all, y_all = [], []
     
     for class_id in range(6):
         class_path = os.path.join(dataset_path, str(class_id))
         for img_file in os.listdir(class_path):
             img_path = os.path.join(class_path, img_file)
             img = cv2.imread(img_path)
-            img = img / 255.0  #Normalize
-            X_train.append(img)
-            y_train.append(class_id)
+            img = img / 255.0  # Normalize
+            X_all.append(img)
+            y_all.append(class_id)
     
-    X_train = np.array(X_train)
+    X_all = np.array(X_all)
+    y_all = np.array(y_all)
+    
+    #SHUFFLE PROPERLY before splitting
+    indices = np.random.permutation(len(X_all))
+    X_all, y_all = X_all[indices], y_all[indices]
+    
+    #MANUAL 80/20 SPLIT (not random)
+    split_idx = int(0.8 * len(X_all))
+    X_train, X_val = X_all[:split_idx], X_all[split_idx:]
+    y_train, y_val = y_all[:split_idx], y_all[split_idx:]
+    
+    # Convert to categorical
     y_train = tf.keras.utils.to_categorical(y_train, 6)
+    y_val = tf.keras.utils.to_categorical(y_val, 6)
     
+    print(f"Training on {len(X_train)} images, Validating on {len(X_val)} images")
+    
+    #SIMPLER MODEL (might be overcomplicating)
     model = tf.keras.Sequential([
         tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(64,64,3)),
-        tf.keras.layers.BatchNormalization(),  
         tf.keras.layers.MaxPooling2D(2,2),
-        tf.keras.layers.Dropout(0.4), 
-        
         tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
-        tf.keras.layers.BatchNormalization(),  
         tf.keras.layers.MaxPooling2D(2,2),
-        tf.keras.layers.Dropout(0.4),  
-        
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(256, activation='relu'), 
-        tf.keras.layers.BatchNormalization(), 
-        tf.keras.layers.Dropout(0.7), 
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(6, activation='softmax')
     ])
     
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        optimizer='adam',
         loss='categorical_crossentropy', 
         metrics=['accuracy']
     )
     
-    print("Training CNN on CPU...")
-    early_stopping = tf.keras.callbacks.EarlyStopping(
-    monitor='val_accuracy',
-    patience=5,
-    restore_best_weights=True
-    )
-
-    history = model.fit(X_train, y_train, epochs=20, 
-                   validation_split=0.2, 
-                   verbose=1, 
-                   batch_size=32,
-                   callbacks=[early_stopping])
+    print("Training SIMPLE CNN on CPU...")
+    history = model.fit(X_train, y_train, 
+                       epochs=15, 
+                       validation_data=(X_val, y_val),  
+                       verbose=1, 
+                       batch_size=32)
 
     # Quick test
     train_acc = history.history['accuracy'][-1]
-    val_acc = history.history['val_accuracy'][-1] if 'val_accuracy' in history.history else 0
+    val_acc = history.history['val_accuracy'][-1]
     
     print(f"🎯 FINAL RESULTS:")
     print(f"   Training Accuracy: {train_acc:.3f}")
     print(f"   Validation Accuracy: {val_acc:.3f}")
     
-    model.save('models/tiny_cpu_model.h5')
+    model.save('models/final_model.h5')
     return history
 
 if __name__ == "__main__":
     print("NUCLEAR OPTION - CPU ONLY TRAINING")
     debug_data_issue()
     history = train_on_cpu()
+
