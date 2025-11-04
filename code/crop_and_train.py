@@ -60,7 +60,7 @@ def create_better_dataset():
         os.makedirs(os.path.join(output_path, str(class_id)), exist_ok=True)
     
     images_processed = 0
-    max_per_class = 80  
+    max_per_class = 150 
     # Process BOTH datasets
     for base_path in [train_base, val_base]:
         for class_id in range(6):
@@ -160,17 +160,25 @@ def train_on_cpu():
     
     print(f"Training on {len(X_train)} images, Validating on {len(X_val)} images")
     
-    #SIMPLER MODEL (might be overcomplicating)
     model = tf.keras.Sequential([
         tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(64,64,3)),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(2,2),
+        
         tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(2,2),
+        
+        tf.keras.layers.Conv2D(128, (3,3), activation='relu'), 
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPooling2D(2,2),
+        
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(6, activation='softmax')
     ])
+    
     
     model.compile(
         optimizer='adam',
@@ -178,7 +186,7 @@ def train_on_cpu():
         metrics=['accuracy']
     )
     
-    print("Training SIMPLE CNN on CPU...")
+    print("Training CNN on CPU...")
     history = model.fit(X_train, y_train, 
                        epochs=15, 
                        validation_data=(X_val, y_val),  
