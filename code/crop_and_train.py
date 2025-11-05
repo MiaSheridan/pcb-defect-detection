@@ -115,7 +115,7 @@ def create_better_dataset():
                                 crop = img[max(0,y1):min(h,y2), max(0,x1):min(w,x2)]
                                 
                                 if crop.size > 0:
-                                    crop = cv2.resize(crop, (128, 128))
+                                    crop = cv2.resize(crop, (64, 64))
                                     crop_path = os.path.join(output_path, str(class_id), f"{class_id}_{count}.jpg")
                                     cv2.imwrite(crop_path, crop)
                                     count += 1
