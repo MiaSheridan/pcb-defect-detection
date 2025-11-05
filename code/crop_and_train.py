@@ -115,7 +115,7 @@ def create_better_dataset():
                                 crop = img[max(0,y1):min(h,y2), max(0,x1):min(w,x2)]
                                 
                                 if crop.size > 0:
-                                    crop = cv2.resize(crop, (64, 64))
+                                    crop = cv2.resize(crop, (128, 128))
                                     crop_path = os.path.join(output_path, str(class_id), f"{class_id}_{count}.jpg")
                                     cv2.imwrite(crop_path, crop)
                                     count += 1
@@ -125,9 +125,9 @@ def create_better_dataset():
     
     print(f"Created balanced dataset with {images_processed} images!")
     return output_path
-
+"""
 def train_on_cpu():
-    """Train a microscopic CNN on CPU only"""
+    # Train a simple CNN on CPU with the balanced dataset
     dataset_path = create_better_dataset()
     
     #Manual data loading with PROPER splitting 80/20
@@ -195,6 +195,133 @@ def train_on_cpu():
     
     model.save('models/final_model.h5')
     return history
+
+"""
+
+def train_on_cpu():
+    """Train a texture-optimized CNN for PCB defect detection"""
+    dataset_path = create_better_dataset()
+    
+    # TEXTURE-SPECIFIC AUGMENTATION
+    train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+        rescale=1./255,
+        rotation_range=15,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        zoom_range=[0.95, 1.05],  # Minimal zoom to preserve textures
+        brightness_range=[0.8, 1.2],
+        contrast_range=[0.8, 1.2],  # Crucial for PCB defects!
+        horizontal_flip=True,
+        vertical_flip=True,  # PCBs can be oriented any direction
+        fill_mode='reflect',
+        validation_split=0.2
+    )
+    
+    # Create generators
+    train_generator = train_datagen.flow_from_directory(
+        dataset_path,
+        target_size=(128, 128),  # Increased for tiny defects
+        batch_size=32,
+        class_mode='categorical',
+        subset='training',
+        shuffle=True
+    )
+    
+    val_generator = train_datagen.flow_from_directory(
+        dataset_path,
+        target_size=(128, 128),
+        batch_size=32,
+        class_mode='categorical',
+        subset='validation',
+        shuffle=False
+    )
+    
+    print(f"Training on {train_generator.samples} images, Validating on {val_generator.samples} images")
+    
+    # TEXTURE-OPTIMIZED MODEL
+    model = tf.keras.Sequential([
+        # First conv block - texture detection
+        tf.keras.layers.Conv2D(32, (5,5), activation='relu', input_shape=(128,128,3)),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Dropout(0.4),  # High dropout from start!
+        
+        # Second conv block - pattern detection
+        tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Dropout(0.5),
+        
+        # Third conv block - fine details
+        tf.keras.layers.Conv2D(128, (3,3), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPooling2D(2,2),
+        tf.keras.layers.Dropout(0.5),
+        
+        # Global pooling instead of flatten - better for textures
+        tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Dropout(0.6),  # Very high dropout!
+        
+        # Classifier
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(6, activation='softmax')
+    ])
+    
+    # Add L2 regularization to prevent overfitting
+    for layer in model.layers:
+        if hasattr(layer, 'kernel_regularizer'):
+            layer.kernel_regularizer = tf.keras.regularizers.l2(0.001)
+    
+    # SLOWER learning rate for fine textures
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    
+    # BETTER CALLBACKS
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(
+            patience=15, 
+            restore_best_weights=True,
+            monitor='val_accuracy'
+        ),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            patience=8, 
+            factor=0.5, 
+            min_lr=1e-7,
+            verbose=1
+        )
+    ]
+    
+    print("Training TEXTURE-OPTIMIZED CNN on CPU...")
+    history = model.fit(
+        train_generator,
+        epochs=50,  # Let early stopping handle it
+        validation_data=val_generator,
+        callbacks=callbacks,
+        verbose=1
+    )
+
+    # Results
+    best_epoch = np.argmax(history.history['val_accuracy'])
+    train_acc = history.history['accuracy'][best_epoch]
+    val_acc = history.history['val_accuracy'][best_epoch]
+    
+    print(f"🎯 BEST RESULTS (Epoch {best_epoch + 1}):")
+    print(f"   Training Accuracy: {train_acc:.3f}")
+    print(f"   Validation Accuracy: {val_acc:.3f}")
+    print(f"   Gap: {train_acc - val_acc:.3f}")
+    
+    # Save model
+    model.save('models/texture_optimized_model.keras')
+    
+    return history, model
+
+
+
 
 if __name__ == "__main__":
     print("NUCLEAR OPTION - CPU ONLY TRAINING")
