@@ -202,17 +202,16 @@ def train_on_cpu():
     """Train a texture-optimized CNN for PCB defect detection"""
     dataset_path = create_better_dataset()
     
-    # TEXTURE-SPECIFIC AUGMENTATION
+    #compatible augmentations for textures
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
         rotation_range=15,
         width_shift_range=0.1,
         height_shift_range=0.1,
-        zoom_range=[0.95, 1.05],  # Minimal zoom to preserve textures
+        zoom_range=0.1,  # Single value instead of range
         brightness_range=[0.8, 1.2],
-        contrast_range=[0.8, 1.2],  # Crucial for PCB defects!
         horizontal_flip=True,
-        vertical_flip=True,  # PCBs can be oriented any direction
+        vertical_flip=True,
         fill_mode='reflect',
         validation_split=0.2
     )
@@ -240,27 +239,27 @@ def train_on_cpu():
     
     # TEXTURE-OPTIMIZED MODEL
     model = tf.keras.Sequential([
-        # First conv block - texture detection
+        # First conv block
         tf.keras.layers.Conv2D(32, (5,5), activation='relu', input_shape=(128,128,3)),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(2,2),
-        tf.keras.layers.Dropout(0.4),  # High dropout from start!
+        tf.keras.layers.Dropout(0.4),
         
-        # Second conv block - pattern detection
+        # Second conv block
         tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(2,2),
         tf.keras.layers.Dropout(0.5),
         
-        # Third conv block - fine details
+        # Third conv block
         tf.keras.layers.Conv2D(128, (3,3), activation='relu'),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(2,2),
         tf.keras.layers.Dropout(0.5),
         
-        # Global pooling instead of flatten - better for textures
+        # Global pooling for textures
         tf.keras.layers.GlobalAveragePooling2D(),
-        tf.keras.layers.Dropout(0.6),  # Very high dropout!
+        tf.keras.layers.Dropout(0.6),
         
         # Classifier
         tf.keras.layers.Dense(128, activation='relu'),
@@ -269,11 +268,12 @@ def train_on_cpu():
         tf.keras.layers.Dense(6, activation='softmax')
     ])
     
+    """
     # Add L2 regularization to prevent overfitting
     for layer in model.layers:
         if hasattr(layer, 'kernel_regularizer'):
             layer.kernel_regularizer = tf.keras.regularizers.l2(0.001)
-    
+    """
     # SLOWER learning rate for fine textures
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
@@ -296,6 +296,7 @@ def train_on_cpu():
         )
     ]
     
+    
     print("Training TEXTURE-OPTIMIZED CNN on CPU...")
     history = model.fit(
         train_generator,
@@ -310,16 +311,15 @@ def train_on_cpu():
     train_acc = history.history['accuracy'][best_epoch]
     val_acc = history.history['val_accuracy'][best_epoch]
     
-    print(f"🎯 BEST RESULTS (Epoch {best_epoch + 1}):")
+    print(f"BEST RESULTS (Epoch {best_epoch + 1}):")
     print(f"   Training Accuracy: {train_acc:.3f}")
     print(f"   Validation Accuracy: {val_acc:.3f}")
     print(f"   Gap: {train_acc - val_acc:.3f}")
     
     # Save model
-    model.save('models/texture_optimized_model.keras')
+    model.save('models/texture_optimized_model.h5')
     
     return history, model
-
 
 
 
