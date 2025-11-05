@@ -180,7 +180,7 @@ def train_on_cpu():
     
     print("Training SIMPLE CNN on CPU...")
     history = model.fit(X_train, y_train, 
-                       epochs=20, 
+                       epochs=15, 
                        validation_data=(X_val, y_val),  
                        verbose=1, 
                        batch_size=32)
