@@ -71,7 +71,7 @@ def train_smart_simple():
     """ original model + ONE new thing Early Stopping"""
     dataset_path = create_better_dataset()
     
-    
+    """""
     X_all, y_all = [], []
     for class_id in range(6):
         class_path = os.path.join(dataset_path, str(class_id))
@@ -96,6 +96,7 @@ def train_smart_simple():
     y_val = tf.keras.utils.to_categorical(y_val, 6)
     
     print(f"Training on {len(X_train)} images, Validating on {len(X_val)} images")
+    """""
     
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
@@ -107,7 +108,7 @@ def train_smart_simple():
     
     train_generator = train_datagen.flow_from_directory(
         dataset_path,
-        target_size=(64, 64),
+        target_size=(128, 128),
         batch_size=32,
         class_mode='categorical',
         subset='training',
@@ -116,7 +117,7 @@ def train_smart_simple():
     
     val_generator = train_datagen.flow_from_directory(
         dataset_path,
-        target_size=(64, 64),
+        target_size=(128, 128),
         batch_size=32,
         class_mode='categorical',
         subset='validation',
