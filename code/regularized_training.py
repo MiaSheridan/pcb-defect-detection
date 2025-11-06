@@ -97,6 +97,31 @@ def train_smart_simple():
     
     print(f"Training on {len(X_train)} images, Validating on {len(X_val)} images")
     
+    train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+        rescale=1./255,
+        rotation_range=10,    #Small rotations
+        horizontal_flip=True, #pcb can be flipped
+        zoom_range=0.1,    #Tiny zoom
+        validation_split=0.2
+    )
+    
+    train_generator = train_datagen.flow_from_directory(
+        dataset_path,
+        target_size=(64, 64),
+        batch_size=32,
+        class_mode='categorical',
+        subset='training',
+        shuffle=True
+    )
+    
+    val_generator = train_datagen.flow_from_directory(
+        dataset_path,
+        target_size=(64, 64),
+        batch_size=32,
+        class_mode='categorical',
+        subset='validation',
+        shuffle=False
+    )
     
     model = tf.keras.Sequential([
         tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(64,64,3)),
