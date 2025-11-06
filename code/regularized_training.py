@@ -144,12 +144,20 @@ def train_smart_simple():
     
     
     callbacks = [
-        tf.keras.callbacks.EarlyStopping(
-            patience=8,  
-            restore_best_weights=True,  #Keep the BEST weights, not final
-            monitor='val_accuracy'
-        )
-    ]
+    tf.keras.callbacks.EarlyStopping(
+        patience=8,  
+        restore_best_weights=True,
+        monitor='val_accuracy'
+    ),
+
+    tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_accuracy', 
+        patience=5,             
+        factor=0.5,            
+        min_lr=1e-7,            
+        verbose=1               
+    )
+]
     
     print("Training SMART SIMPLE CNN ")
     history = model.fit(
