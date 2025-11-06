@@ -99,11 +99,9 @@ def train_smart_simple():
     
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
-        rotation_range=15,
-        width_shift_range=0.1,
-        height_shift_range=0.1,  # Small shifts
-        horizontal_flip=True,     #pcb can be flipped
-        zoom_range=0.15,           #Tiny zoom
+        rotation_range=15,    #Small rotations
+        horizontal_flip=True, #pcb can be flipped
+        zoom_range=0.1,    #Tiny zoom
         validation_split=0.2
     )
     
@@ -145,7 +143,7 @@ def train_smart_simple():
     
     callbacks = [
         tf.keras.callbacks.EarlyStopping(
-            patience=8,  # Stop if no improvement for 8 epochs
+            patience=12,  #increased 
             restore_best_weights=True,  #Keep the BEST weights, not final
             monitor='val_accuracy'
         )
@@ -154,7 +152,7 @@ def train_smart_simple():
     print("Training SMART SIMPLE CNN ")
     history = model.fit(
         X_train, y_train,
-        epochs=30,  # Will stop early anyway
+        epochs=40,  # Will stop early anyway
         validation_data=(X_val, y_val),
         callbacks=callbacks,  # Only change!
         verbose=1,
