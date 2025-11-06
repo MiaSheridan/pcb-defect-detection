@@ -58,7 +58,7 @@ def create_better_dataset():
                                     continue
                                 crop = img[max(0,y1):min(h,y2), max(0,x1):min(w,x2)]
                                 if crop.size > 0:
-                                    crop = cv2.resize(crop, (64, 64))
+                                    crop = cv2.resize(crop, (128, 128))
                                     crop_path = os.path.join(output_path, str(class_id), f"{class_id}_{count}.jpg")
                                     cv2.imwrite(crop_path, crop)
                                     count += 1
@@ -124,7 +124,7 @@ def train_smart_simple():
     )
     
     model = tf.keras.Sequential([
-        tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(64,64,3)),
+        tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(128,128,3)),
        
         tf.keras.layers.MaxPooling2D(2,2),
         tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
