@@ -151,12 +151,14 @@ def train_smart_simple():
     
     print("Training SMART SIMPLE CNN ")
     history = model.fit(
-        X_train, y_train,
+        train_generator,
+        validation_data=val_generator,
+        #X_train, y_train,
         epochs=30,  # Will stop early anyway
-        validation_data=(X_val, y_val),
+        #validation_data=(X_val, y_val),
         callbacks=callbacks,  # Only change!
         verbose=1,
-        batch_size=32
+        #batch_size=32
     )
 
     #Report the BEST epoch, not the final one
