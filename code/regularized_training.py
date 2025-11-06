@@ -143,7 +143,7 @@ def train_smart_simple():
     
     callbacks = [
         tf.keras.callbacks.EarlyStopping(
-            patience=12,  #increased 
+            patience=8,  
             restore_best_weights=True,  #Keep the BEST weights, not final
             monitor='val_accuracy'
         )
@@ -152,7 +152,7 @@ def train_smart_simple():
     print("Training SMART SIMPLE CNN ")
     history = model.fit(
         X_train, y_train,
-        epochs=40,  # Will stop early anyway
+        epochs=30,  # Will stop early anyway
         validation_data=(X_val, y_val),
         callbacks=callbacks,  # Only change!
         verbose=1,
