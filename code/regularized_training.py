@@ -152,7 +152,7 @@ def train_smart_simple():
 
     tf.keras.callbacks.ReduceLROnPlateau(
         monitor='val_accuracy', 
-        patience=5,             
+        patience=8,             
         factor=0.5,            
         min_lr=1e-7,            
         verbose=1               
