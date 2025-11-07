@@ -102,7 +102,9 @@ def train_smart_simple():
         rescale=1./255,
         rotation_range=15,    #Small rotations
         horizontal_flip=True, #pcb can be flipped
+        vertical_flip=True,    
         zoom_range=0.1,    #Tiny zoom
+        brightness_range=[0.8, 1.2],
         validation_split=0.2
     )
     
