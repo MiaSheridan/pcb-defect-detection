@@ -3,11 +3,13 @@ from tensorflow.keras.models import load_model
 import numpy as np
 from PIL import Image
 import io
+import os
+
 
 app = Flask(__name__)
 
 #Load trained model
-model = load_model('../models/smart_simple_model.h5')
+model = load_model('models/smart_simple_model.h5')
 
 #The 6 defect types 
 DEFECT_TYPES = [
