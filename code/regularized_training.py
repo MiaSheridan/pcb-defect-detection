@@ -140,12 +140,10 @@ def train_smart_simple():
         tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(6, activation='softmax')
     ])
-
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.0007) 
     
     model.compile(
-        optimizer=optimizer,
-        loss='categorical_crossentropy',
+        optimizer='adam',
+        loss='categorical_crossentropy', 
         metrics=['accuracy']
     )
     
