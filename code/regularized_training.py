@@ -1,6 +1,6 @@
 
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+#os.environ['CUDA_VISIBLE_DEVICES'] = '-1' using GPU now 
 import tensorflow as tf
 import cv2
 import numpy as np
