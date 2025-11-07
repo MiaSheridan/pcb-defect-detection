@@ -138,8 +138,8 @@ def train_smart_simple():
         
         
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.0001)),
-        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(6, activation='softmax')
     ])
     
