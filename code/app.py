@@ -6,6 +6,19 @@ import io
 import os
 
 
+print("=== DEBUG INFO ===")
+print("Current directory:", os.getcwd())
+print("Listing all files/folders in current directory:")
+for item in os.listdir('.'):
+    print("  -", item)
+
+print("\nChecking models folder:")
+if os.path.exists('models'):
+    print("models/ exists! Contents:")
+    for item in os.listdir('models'):
+        print("  -", item)
+else:
+    print("models/ folder does NOT exist!")
 app = Flask(__name__)
 
 #Load trained model
