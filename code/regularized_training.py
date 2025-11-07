@@ -171,7 +171,7 @@ def train_smart_simple():
         train_generator,
         validation_data=val_generator,
         #X_train, y_train,
-        epochs=50,  # Will stop early anyway
+        epochs=45,  # Will stop early anyway
         #validation_data=(X_val, y_val),
         callbacks=callbacks,  # Only change!
         verbose=1,
