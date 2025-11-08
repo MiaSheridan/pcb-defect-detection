@@ -21,7 +21,7 @@ def create_validation_generator():
     
     val_generator = val_datagen.flow_from_directory(
         os.path.join(dataset_path, 'val'), 
-        target_size=(224, 224),          
+        target_size=(128, 128),          
         batch_size=16,                      
         class_mode='categorical',           
         shuffle=False,                      
@@ -34,9 +34,9 @@ def evaluate_model():
     print(" Evaluating PCB Defect Detection Model ")
     
     #load your best model
-    print("Loading trained model from models/best_pcb_model_224.h5...")
-    model = tf.keras.models.load_model('models/best_pcb_model_224.h5')
-    print("Model loaded successfully!")
+    print("Loading trained model from models/best_pcb_model.h5...")
+    model = tf.keras.models.load_model('models/best_pcb_model.h5')
+    print("Model loaded successfully!!!!")
     
     #create validation generator (matches training exactly)
     val_generator = create_validation_generator()
