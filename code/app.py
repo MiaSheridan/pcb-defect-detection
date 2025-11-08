@@ -22,7 +22,7 @@ else:
 app = Flask(__name__)
 
 #Load trained model
-model = load_model('models/smart_simple_model.h5')
+model = load_model('models/best_pcb_model.h5')
 
 #The 6 defect types 
 DEFECT_TYPES = [
