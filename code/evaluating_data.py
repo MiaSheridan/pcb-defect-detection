@@ -25,7 +25,7 @@ def create_validation_generator():
         batch_size=32,                      
         class_mode='categorical',           
         shuffle=False,
-        subset='validation',                     
+        #subset='validation',                     
         seed=42
     )
     
