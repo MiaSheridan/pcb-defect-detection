@@ -102,12 +102,10 @@ def train_smart_simple():
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
         rotation_range=15,    #Small rotations
-        width_shift_range=0.05, 
-        height_shift_range=0.05,
         horizontal_flip=True, #pcb can be flipped
         vertical_flip=True,    
         zoom_range=0.05,    #Tiny zoom
-        brightness_range=[0.8, 1.1],
+        brightness_range=[0.9, 1.1],
         fill_mode='constant', 
         validation_split=0.2
     )
