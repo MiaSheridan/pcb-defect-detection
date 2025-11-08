@@ -20,11 +20,12 @@ def create_validation_generator():
     val_datagen = ImageDataGenerator(rescale=1./255)
     
     val_generator = val_datagen.flow_from_directory(
-        os.path.join(dataset_path, 'val'), 
+        dataset_path,
         target_size=(128, 128),          
-        batch_size=16,                      
+        batch_size=32,                      
         class_mode='categorical',           
-        shuffle=False,                      
+        shuffle=False,
+        subset='validation',                     
         seed=42
     )
     
