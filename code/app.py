@@ -19,7 +19,8 @@ if os.path.exists('models'):
         print("  -", item)
 else:
     print("models/ folder does NOT exist!")
-app = Flask(__name__)
+
+app = Flask(__name__, template_folder='../templates')
 
 #Load trained model
 model = load_model('models/best_pcb_model.h5')
