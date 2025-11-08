@@ -9,8 +9,8 @@ from tensorflow.keras import regularizers
 def create_better_dataset():
     """ EXACT same dataset function"""
     print("==CREATING BALANCED DATASET ===")
-    train_base = "/content/pcb-defect-dataset/train"
-    val_base = "/content/pcb-defect-dataset/val"
+    train_base = "/content/pcb-defect-dataset/pcb-defect-dataset/train"
+    val_base = "/content/pcb-defect-dataset/pcb-defect-dataset/val"
     output_path = "/content/pcb-defect-detection/balanced_dataset"
     
     for class_id in range(6):
