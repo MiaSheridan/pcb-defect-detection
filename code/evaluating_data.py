@@ -14,7 +14,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 def create_validation_generator():
     """Create validation generator """
-    dataset_path = "dataset"  #same as training
+    dataset_path = "balanced_dataset"  #same as training
     
     # ONLY rescaling - same as training validation
     val_datagen = ImageDataGenerator(rescale=1./255)
