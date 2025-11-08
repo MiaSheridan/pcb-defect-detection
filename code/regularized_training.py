@@ -72,32 +72,6 @@ def train_smart_simple():
     """ original model + ONE new thing Early Stopping"""
     dataset_path = create_better_dataset()
     
-    """""
-    X_all, y_all = [], []
-    for class_id in range(6):
-        class_path = os.path.join(dataset_path, str(class_id))
-        for img_file in os.listdir(class_path):
-            img_path = os.path.join(class_path, img_file)
-            img = cv2.imread(img_path)
-            img = img / 255.0
-            X_all.append(img)
-            y_all.append(class_id)
-    
-    X_all = np.array(X_all)
-    y_all = np.array(y_all)
-    
-    indices = np.random.permutation(len(X_all))
-    X_all, y_all = X_all[indices], y_all[indices]
-    
-    split_idx = int(0.8 * len(X_all))
-    X_train, X_val = X_all[:split_idx], X_all[split_idx:]
-    y_train, y_val = y_all[:split_idx], y_all[split_idx:]
-    
-    y_train = tf.keras.utils.to_categorical(y_train, 6)
-    y_val = tf.keras.utils.to_categorical(y_val, 6)
-    
-    print(f"Training on {len(X_train)} images, Validating on {len(X_val)} images")
-    """""
     
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
@@ -169,6 +143,12 @@ def train_smart_simple():
         factor=0.5,            
         min_lr=1e-7,            
         verbose=1               
+    ),
+    tf.keras.callbacks.ModelCheckpoint(
+        'best_pcb_model.h5', monitor='val_accuracy', 
+        save_best_only=True, 
+        save_weights_only=True, 
+        verbose=1
     )
 ]
     
@@ -193,8 +173,15 @@ def train_smart_simple():
     print(f"   Training Accuracy: {train_acc:.3f}")
     print(f"   Validation Accuracy: {val_acc:.3f}")
     print(f"   Improvement over final: {val_acc - history.history['val_accuracy'][-1]:.3f}")
+
+    print(f"Final epoch val accuracy: {history.history['val_accuracy'][-1]:.3f}")
+    print(f"Best epoch val accuracy: {val_acc:.3f}")
+
+
+    model.load_weights('best_pcb_model.h5')
     
     model.save('models/smart_simple_model.h5')
+    model.save_weights('models/smart_simple_weights.h5')
     return history, model
 
 if __name__ == "__main__":
