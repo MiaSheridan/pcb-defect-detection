@@ -145,9 +145,10 @@ def train_smart_simple():
         verbose=1               
     ),
     tf.keras.callbacks.ModelCheckpoint(
-        'best_pcb_model.h5', monitor='val_accuracy', 
+       'best_pcb_model.h5',
+        monitor='val_accuracy', 
         save_best_only=True, 
-        save_weights_only=True, 
+        #save_weights_only=True, 
         verbose=1
     )
 ]
