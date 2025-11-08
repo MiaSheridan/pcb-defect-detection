@@ -182,7 +182,7 @@ def train_smart_simple():
     model.load_weights('best_pcb_model.h5')
     
     model.save('models/smart_simple_model.h5')
-    model.save_weights('models/smart_simple_weights.h5')
+    model.save_weights('models/smart_simple_weights.weights.h5') 
     return history, model
 
 if __name__ == "__main__":
