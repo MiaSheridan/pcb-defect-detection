@@ -102,10 +102,13 @@ def train_smart_simple():
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rescale=1./255,
         rotation_range=15,    #Small rotations
+        width_shift_range=0.05, 
+        height_shift_range=0.05,
         horizontal_flip=True, #pcb can be flipped
         vertical_flip=True,    
-        zoom_range=0.1,    #Tiny zoom
-        brightness_range=[0.8, 1.2],
+        zoom_range=0.05,    #Tiny zoom
+        brightness_range=[0.8, 1.1],
+        fill_mode='constant', 
         validation_split=0.2
     )
     
@@ -128,6 +131,7 @@ def train_smart_simple():
     )
     
     model = tf.keras.Sequential([
+        #Block 1
         tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(128,128,3)),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(2,2),
@@ -137,13 +141,13 @@ def train_smart_simple():
         tf.keras.layers.MaxPooling2D(2,2),
 
         tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
-         tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.BatchNormalization(),
         
         
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(128, activation='relu'),
         tf.keras.layers.BatchNormalization(),  
-        tf.keras.layers.Dropout(0.4),
+        tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(6, activation='softmax')
     ])
     
