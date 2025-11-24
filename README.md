@@ -91,18 +91,25 @@ Output Layer (6 units, Softmax Activation)
 - OpenCV
 - PIL
 
-### Step-by-Step Installation
+## Quick Demo (Google Colab)
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/MiaSheridan/pcb-defect-detection.git
-   cd pcb-defect-detection
-   ```
+### Step 1: Download the Model
+**Download the pre-trained model:**
+https://drive.google.com/file/d/1FbpueBcYs9UbIWvPBGKraoZpYqaah8fQ/view?usp=sharing
 
-2. **Run the Application**
-   ```bash
-   python app.py
-   ```
+1. Click the link above
+2. Click the "Download" button in Google Drive
+3. Save the file to your computer
 
-3. **Open your browser**
-   Go to: http://localhost:5000
+### Step 2: Upload to Google Drive
+1. Go to [Google Drive](https://drive.google.com)
+2. Upload the downloaded `pcb_defect_model_84percent.h5` file to your main Drive folder (not in any subfolder)
+
+### Step 3: Run the Demo in Colab
+1. Go to [Google Colab](https://colab.research.google.com/)
+2. Create a new notebook
+3. Copy and paste the entire code from code/app_colab.py into a cell
+4. Run the cell
+5. Output should provide a URL
+6. Click on the link and it will redirect you to the user interface 
+
